@@ -1,0 +1,34 @@
+{
+  "name": "canal-rodrigo-anim",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Escenas animadas (motion graphics + 3D) del Video 2 del canal de Rodrigo Fuentes. Remotion + three.js. Render real SOLO en pods (scripts/anim_render.py).",
+  "scripts": {
+    "studio": "remotion studio",
+    "tipos": "tsc --noEmit",
+    "bundle": "remotion bundle --out-dir build"
+  },
+  "dependencies": {
+    "@react-three/drei": "9.122.0",
+    "@react-three/fiber": "8.18.0",
+    "@react-three/postprocessing": "2.19.1",
+    "@remotion/cli": "4.0.540",
+    "@remotion/google-fonts": "4.0.540",
+    "@remotion/motion-blur": "4.0.540",
+    "@remotion/three": "4.0.540",
+    "cannon-es": "0.20.0",
+    "opentype.js": "1.3.4",
+    "postprocessing": "6.39.6",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "remotion": "4.0.540",
+    "three": "0.172.0"
+  },
+  "devDependencies": {
+    "@types/opentype.js": "1.3.8",
+    "@types/react": "18.3.31",
+    "@types/react-dom": "18.3.7",
+    "@types/three": "0.172.0",
+    "typescript": "5.9.3"
+  }
+}
