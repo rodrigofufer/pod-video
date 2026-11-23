@@ -29,14 +29,27 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - uses: docker/build-push-action@v6
+      - name: Imagen base (ligera, para cada video)
+        uses: docker/build-push-action@v6
         with:
           context: .
+          target: base
           push: true
           tags: |
+            ghcr.io/${{ github.repository_owner }}/pod-video:base
             ghcr.io/${{ github.repository_owner }}/pod-video:latest
-            ghcr.io/${{ github.repository_owner }}/pod-video:${{ github.run_number }}
+            ghcr.io/${{ github.repository_owner }}/pod-video:base-${{ github.run_number }}
           labels: |
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
-            org.opencontainers.image.description=Pod de video (Remotion, ffmpeg, Blender, ComfyUI, audio) para RunPod
+      - name: Imagen ia (pesada, para tareas de IA)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          target: ia
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/pod-video:ia
+            ghcr.io/${{ github.repository_owner }}/pod-video:ia-${{ github.run_number }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
       - run: df -h /

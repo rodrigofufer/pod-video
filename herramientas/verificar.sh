@@ -1,6 +1,6 @@
 #!/bin/bash
 # Verifica qué trae la imagen del pod de video. Uso en el pod: /opt/pod-video/verificar.sh  (--sin-gpu: sin nvidia-smi)
-echo "imagen pod-video $(cat /opt/pod-video/VERSION 2>/dev/null)"
+echo "imagen pod-video:$(cat /opt/pod-video/TIPO 2>/dev/null) $(cat /opt/pod-video/VERSION 2>/dev/null)"
 [ "$1" = "--sin-gpu" ] || nvidia-smi --query-gpu=name,memory.total,driver_version --format=csv,noheader
 echo "ffmpeg (sistema): $(ffmpeg -version | head -1)"
 echo "ffmpeg8: $(ffmpeg8 -version 2>/dev/null | head -1)"

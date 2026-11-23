@@ -1,10 +1,13 @@
 # Imagen del pod de video de Rodrigo (RunPod). Lleva YA INSTALADO lo que antes se instalaba en cada pod, más las
 # herramientas nuevas. Sin modelos de IA dentro (se bajan de Hugging Face al usarlos) y SIN llaves ni archivos privados.
-# Se arma en GitHub Actions (.github/workflows/imagen.yml) → ghcr.io/rodrigofufer/pod-video:latest
+# Se arma en GitHub Actions (.github/workflows/imagen.yml) en DOS imágenes (2026-11-23: una sola pesaba 19 GB y el pod
+# tardaba >12 min en arrancar, cobrando):
+#   ghcr.io/rodrigofufer/pod-video:base (= :latest)  editores, Remotion, ffmpeg 8, Blender  → para cada video
+#   ghcr.io/rodrigofufer/pod-video:ia                 base + PyTorch/ComfyUI, audio, kit de estilo, ACE-Step → tareas de IA
 # Detalle y plan: /home/rod/conocimiento/proyectos/pod-video.md
 
 # Misma base que los pods de siempre (sshd + PUBLIC_KEY de RunPod): el ssh, el vigía y los scripts funcionan igual.
-FROM runpod/base:1.6.0-ubuntu2404
+FROM runpod/base:1.6.0-ubuntu2404 AS base
 
 ENV DEBIAN_FRONTEND=noninteractive PIP_NO_CACHE_DIR=1 NVIDIA_DRIVER_CAPABILITIES=all \
     HF_HUB_ENABLE_HF_TRANSFER=1 HF_HOME=/root/.cache/huggingface NPM_CONFIG_UPDATE_NOTIFIER=false NO_UPDATE_NOTIFIER=1
@@ -47,6 +50,13 @@ RUN set -e; S=$(curl -fsSL https://download.blender.org/release/ | grep -o 'Blen
     echo "blender: $S$F"; curl -fsSL "https://download.blender.org/release/$S$F" | tar -xJ -C /opt; \
     ln -s /opt/${F%.tar.xz}/blender /usr/local/bin/blender
 
+# ── Ficha de la imagen base ───────────────────────────────────────────────────────────────────────────────────────
+COPY herramientas/verificar.sh /opt/pod-video/verificar.sh
+RUN chmod +x /opt/pod-video/verificar.sh && touch /opt/AVISOS.txt && echo base > /opt/pod-video/TIPO && date -u +%Y-%m-%dT%H:%MZ > /opt/pod-video/VERSION \
+    && /opt/pod-video/verificar.sh --sin-gpu > /opt/pod-video/versiones.txt 2>&1 || true
+
+# ════════════════════════ imagen :ia (pesada) ════════════════════════
+FROM base AS ia
 # ── 4. Nuevo: IA (PyTorch CUDA 12.8 para la 5090 + ComfyUI + Hugging Face rápido) ───────────────────────────────
 RUN python3 -m venv /opt/venv-ia && /opt/venv-ia/bin/pip install -q torch torchvision torchaudio \
       --index-url https://download.pytorch.org/whl/cu128 \
@@ -76,7 +86,5 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR=/usr/local/b
     && ln -s /opt/ACE-Step-1.5/.venv /opt/venv-acestep \
     || echo "aviso: ACE-Step 1.5 no se instaló" >> /opt/AVISOS.txt
 
-# ── 6. Ficha de la imagen ───────────────────────────────────────────────────────────────────────────────────────
-COPY herramientas/verificar.sh /opt/pod-video/verificar.sh
-RUN chmod +x /opt/pod-video/verificar.sh && touch /opt/AVISOS.txt && date -u +%Y-%m-%dT%H:%MZ > /opt/pod-video/VERSION \
+RUN date -u +%Y-%m-%dT%H:%MZ > /opt/pod-video/VERSION && echo ia > /opt/pod-video/TIPO \
     && /opt/pod-video/verificar.sh --sin-gpu > /opt/pod-video/versiones.txt 2>&1 || true
