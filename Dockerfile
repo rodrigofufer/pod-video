@@ -39,9 +39,9 @@ RUN python3 -m venv /opt/venv-canal && /opt/venv-canal/bin/pip install -q numpy 
       faster-whisper nvidia-cublas-cu12 nvidia-cudnn-cu12
 
 # ── 2. Nuevo: ffmpeg 8.x estático (NVENC, libplacebo, vmaf, Vulkan, whisper) como «ffmpeg8» (no reemplaza al de arriba) ──
-RUN set -e; U=$(curl -fsSL https://api.github.com/repos/BtbN/FFmpeg-Builds/releases/latest \
-      | python3 -c "import json,sys; a=[x['browser_download_url'] for x in json.load(sys.stdin)['assets'] if x['name'].endswith('-linux64-gpl-8.1.tar.xz') or x['name'].endswith('-linux64-gpl-8.0.tar.xz')]; print(sorted(a)[-1])"); \
-    echo "ffmpeg8: $U"; curl -fsSL "$U" | tar -xJ -C /opt; D=$(ls -d /opt/ffmpeg-n8*-linux64-gpl-8*); \
+# Liga fija de la release «latest» de BtbN (sin la API de GitHub: en Actions da 403 por límite, 2026-11-22).
+RUN set -e; U=https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n8.1-latest-linux64-gpl-8.1.tar.xz; \
+    echo "ffmpeg8: $U"; curl -fsSL --retry 4 "$U" | tar -xJ -C /opt; D=$(ls -d /opt/ffmpeg-n8*-linux64-gpl-8*); \
     ln -s "$D/bin/ffmpeg" /usr/local/bin/ffmpeg8; ln -s "$D/bin/ffprobe" /usr/local/bin/ffprobe8
 
 # ── 3. Nuevo: Blender 5.x (Cycles con OptiX, Gaussian splats) en modo consola ────────────────────────────────────
