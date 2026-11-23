@@ -61,6 +61,19 @@ RUN python3 -m venv /opt/venv-audio && /opt/venv-audio/bin/pip install -q torch 
     && for p in whisperx clearvoice "audio-separator[gpu]" beat-this auto-editor "scenedetect[opencv]" "huggingface_hub[hf_transfer]"; do \
          /opt/venv-audio/bin/pip install -q "$p" || echo "aviso: no se instaló $p" >> /opt/AVISOS.txt; done
 
+# ── 5b. Kit de estilo «Huge» (2026-11-22, ver ~/conocimiento/proyectos/kit-estilo.md) ──────────────────────────
+# venv-ia: FLUX 3 Klein y otros modelos de imagen por diffusers (miniaturas), OpenColorIO (color fijo del canal) y
+# Playwright + Chromium (capturas de titulares y páginas para collages, como en Huge If True).
+RUN /opt/venv-ia/bin/pip install -q diffusers transformers accelerate sentencepiece protobuf opencolorio playwright \
+    && /opt/venv-ia/bin/playwright install --with-deps chromium >/dev/null \
+    || echo "aviso: kit de estilo en venv-ia incompleto" >> /opt/AVISOS.txt
+# ACE-Step 1.5 (música propia del canal, MIT): venv aparte; los pesos se bajan al usarlo (HF_HOME)
+RUN git clone --depth 1 https://github.com/ACE-Step/ACE-Step-1.5 /opt/ACE-Step-1.5 \
+    && python3 -m venv /opt/venv-acestep \
+    && /opt/venv-acestep/bin/pip install -q torch torchaudio --index-url https://download.pytorch.org/whl/cu128 \
+    && (cd /opt/ACE-Step-1.5 && /opt/venv-acestep/bin/pip install -q -e .) \
+    || echo "aviso: ACE-Step 1.5 no se instaló" >> /opt/AVISOS.txt
+
 # ── 6. Ficha de la imagen ───────────────────────────────────────────────────────────────────────────────────────
 COPY herramientas/verificar.sh /opt/pod-video/verificar.sh
 RUN chmod +x /opt/pod-video/verificar.sh && touch /opt/AVISOS.txt && date -u +%Y-%m-%dT%H:%MZ > /opt/pod-video/VERSION \

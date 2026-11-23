@@ -11,6 +11,8 @@ echo "blender: $(blender --version 2>/dev/null | head -1)"
 echo "venv-canal: $(/opt/venv-canal/bin/python -c 'import numpy,PIL,faster_whisper;print("ok")' 2>&1 | tail -1)"
 echo "venv-ia: $(/opt/venv-ia/bin/python -c 'import torch;print("torch",torch.__version__,"cuda",torch.version.cuda,"gpu",torch.cuda.is_available())' 2>&1 | tail -1)"
 echo "venv-audio: $(/opt/venv-audio/bin/python -c 'import importlib.util as u;print({m:bool(u.find_spec(m)) for m in ["whisperx","clearvoice","audio_separator","beat_this","scenedetect"]})' 2>&1 | tail -1)"
+echo "kit estilo: $(/opt/venv-ia/bin/python -c 'import diffusers,PyOpenColorIO,playwright;print("diffusers",diffusers.__version__,"ocio ok","playwright ok")' 2>&1 | tail -1)"
+echo "ACE-Step: $(ls /opt/ACE-Step-1.5 >/dev/null 2>&1 && /opt/venv-acestep/bin/python -c 'import acestep;print("ok")' 2>&1 | tail -1)"
 echo "ComfyUI: $(git -C /opt/ComfyUI log -1 --format=%cd --date=short 2>/dev/null) · nodos: $(ls /opt/ComfyUI/custom_nodes | tr '\n' ' ')"
 [ -s /opt/AVISOS.txt ] && { echo "AVISOS:"; cat /opt/AVISOS.txt; }
 exit 0
