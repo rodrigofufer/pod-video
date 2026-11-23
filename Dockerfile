@@ -67,11 +67,12 @@ RUN python3 -m venv /opt/venv-audio && /opt/venv-audio/bin/pip install -q torch 
 RUN /opt/venv-ia/bin/pip install -q diffusers transformers accelerate sentencepiece protobuf opencolorio playwright \
     && /opt/venv-ia/bin/playwright install --with-deps chromium >/dev/null \
     || echo "aviso: kit de estilo en venv-ia incompleto" >> /opt/AVISOS.txt
-# ACE-Step 1.5 (música propia del canal, MIT): venv aparte; los pesos se bajan al usarlo (HF_HOME)
-RUN git clone --depth 1 https://github.com/ACE-Step/ACE-Step-1.5 /opt/ACE-Step-1.5 \
-    && python3 -m venv /opt/venv-acestep \
-    && /opt/venv-acestep/bin/pip install -q torch torchaudio --index-url https://download.pytorch.org/whl/cu128 \
-    && (cd /opt/ACE-Step-1.5 && /opt/venv-acestep/bin/pip install -q -e .) \
+# ACE-Step 1.5 (música propia del canal, MIT): se instala con «uv sync» (nano-vllm viene dentro de su repo, no de
+# PyPI). Su entorno queda en /opt/ACE-Step-1.5/.venv; los pesos se bajan al usarlo (HF_HOME).
+RUN curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR=/usr/local/bin sh \
+    && git clone --depth 1 https://github.com/ACE-Step/ACE-Step-1.5 /opt/ACE-Step-1.5 \
+    && (cd /opt/ACE-Step-1.5 && uv sync --python 3.12 -q) \
+    && ln -s /opt/ACE-Step-1.5/.venv /opt/venv-acestep \
     || echo "aviso: ACE-Step 1.5 no se instaló" >> /opt/AVISOS.txt
 
 # ── 6. Ficha de la imagen ───────────────────────────────────────────────────────────────────────────────────────
