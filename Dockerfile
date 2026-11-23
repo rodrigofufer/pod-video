@@ -63,8 +63,9 @@ RUN python3 -m venv /opt/venv-audio && /opt/venv-audio/bin/pip install -q torch 
 
 # ── 5b. Kit de estilo «Huge» (2026-11-22, ver ~/conocimiento/proyectos/kit-estilo.md) ──────────────────────────
 # venv-ia: FLUX 3 Klein y otros modelos de imagen por diffusers (miniaturas), OpenColorIO (color fijo del canal) y
-# Playwright + Chromium (capturas de titulares y páginas para collages, como en Huge If True).
-RUN /opt/venv-ia/bin/pip install -q diffusers transformers accelerate sentencepiece protobuf opencolorio playwright \
+# Playwright + Chromium (capturas de titulares y páginas para collages, como en Huge If True); timm/kornia/einops para
+# BiRefNet (efecto «texto detrás del objeto», scripts/frente_alfa.py).
+RUN /opt/venv-ia/bin/pip install -q diffusers transformers accelerate sentencepiece protobuf opencolorio playwright timm kornia einops \
     && /opt/venv-ia/bin/playwright install --with-deps chromium >/dev/null \
     || echo "aviso: kit de estilo en venv-ia incompleto" >> /opt/AVISOS.txt
 # ACE-Step 1.5 (música propia del canal, MIT): se instala con «uv sync» (nano-vllm viene dentro de su repo, no de
